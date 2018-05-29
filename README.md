@@ -1,4 +1,4 @@
-![Seneca](http://senecajs.org/files/assets/seneca-logo.png)
+![Seneca](http://senecajs.org/files/assets/seneca-logo.png)<br/>
 proximity p2p transport plugin using zyre.js  
 
 # seneca-zyre-transport
