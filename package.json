@@ -1,0 +1,31 @@
+{
+  "name": "seneca-zyre-transport",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+ssh://git@github.com/fluidnotions/seneca-zyre-transport.git"
+  },
+  "keywords": [
+    "seneca",
+    "transport",
+    "zyre.js",
+    "zeromq",
+    "p2p"
+  ],
+  "author": "justin",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/fluidnotions/seneca-zyre-transport/issues"
+  },
+  "homepage": "https://github.com/fluidnotions/seneca-zyre-transport#readme",
+  "dependencies": {
+    "lodash": "^4.17.10",
+    "seneca": "^3.6.0",
+    "zyre.js": "^1.2.0"
+  }
+}
