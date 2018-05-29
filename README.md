@@ -1,14 +1,8 @@
 ![Seneca](http://senecajs.org/files/assets/seneca-logo.png)
-> A [Seneca.js][] proximity p2p transport plugin using zyre.js  
+proximity p2p transport plugin using zyre.js  
 
 # seneca-zyre-transport
-[![npm version][npm-badge]][npm-url]
-[![Build Status][travis-badge]][travis-url]
-[![Coverage Status][coveralls-badge]][coveralls-url]
-[![Dependency Status][david-badge]][david-url]
-[![Gitter][gitter-badge]][gitter-url]
 
-[![js-standard-style][standard-badge]][standard-style]
 
 __Note:__ This is broadcast transport. All subscribed micro-services receive all messages. Hoverver responses are send directly back to the caller
 
