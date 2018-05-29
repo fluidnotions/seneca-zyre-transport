@@ -10,7 +10,7 @@ __Note:__ This is broadcast transport. All subscribed micro-services receive all
 Tested on  **3.5**
 
 ## Install
-To install, simply use npm. Remember you will need to install [Seneca.js][] if you haven't already.
+To install, simply use npm.
 
 ```sh
 
