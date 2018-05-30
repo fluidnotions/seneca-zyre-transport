@@ -22,11 +22,13 @@ module.exports = function (options) {
                     terminalId: undefined //required in constructor zyreConfig
                 },
                 evasive: 5000,    // Timeout after which the local node will try to ping a not responding peer
-                expired: 2147483647, //maximum positive value for a 32-bit signed binary integer  // Timeout after which a not responding peer gets disconnected
+                expired: 214748364, //large positive value for a 32-bit signed binary integer  // Timeout after which a not responding peer gets disconnected
                 port: 49152,      // Port for incoming messages, will be incremented if already in use
                 bport: 5670,      // Discovery beacon broadcast port
                 binterval: 1000,  // Discovery beacon broadcast interval,
-                testing: false
+                debug: {
+                    ztrans: false, //verbose zyre.js logging
+                }
             }
         },
         so.transport,
@@ -38,7 +40,7 @@ module.exports = function (options) {
         zyre.setEncoding('utf8');
         let zyrePeerId = zyre.getIdentity()
         myZyreIdentity = { originIp: zyre._ifaceData.address, terminalId: options.zyre.headers.terminalId, zyrePeerId: zyrePeerId, name: options.zyre.name };
-        if (options.zyre.testing) {
+        if (options.zyre.debug.ztrans) {
             // let me = options.zyre.headers.terminalId;
             let me = options.zyre.name;
             zyre.on('connect', (id, name, headers) => {
@@ -98,7 +100,7 @@ module.exports = function (options) {
 
         zyre.on('shout', (id, name, message, group) => {
             if (group === DEFAULT_SERVICE_CHANNEL) {
-                if (options.zyre.testing) console.log("broadcast recieved from: ", name)
+                if (options.zyre.debug.ztrans) console.log("broadcast recieved from: ", name)
                 //every message should have a zyrePeerId added into it via ack
                 let data = transport_utils.parseJSON(seneca, 'listen-' + type, message)
                 let originZyrePeer = data.originZyrePeerId;
@@ -111,7 +113,7 @@ module.exports = function (options) {
                         seneca.log.info("no result")
                     } else {
                         let outstr = transport_utils.stringifyJSON(seneca, 'listen-' + type, out)
-                        if (options.zyre.testing) console.log("sending direct to: ", originZyrePeer)
+                        if (options.zyre.debug.ztrans) console.log("sending direct to: ", originZyrePeer)
                         zyre.whisper(originZyrePeer.zyrePeerId, outstr)
                     }
                 })
@@ -136,7 +138,7 @@ module.exports = function (options) {
     })
 
     seneca.add({ role: 'transport', hook: 'client', type: 'zyre' }, function (args, clientdone) {
-        if (options.zyre.testing) console.log("inside { role: 'transport', hook: 'client', type: 'zyre' }")
+        if (options.zyre.debug.ztrans) console.log("inside { role: 'transport', hook: 'client', type: 'zyre' }")
         let seneca = this
         let type = args.type
         let client_options = seneca.util.clean(_.extend({}, options[type], args))
@@ -145,10 +147,10 @@ module.exports = function (options) {
         transport_utils.make_client(make_send, client_options, clientdone)
 
         function make_send(spec, topic, send_done) {
-            if (options.zyre.testing) console.log("inside make_send")
+            if (options.zyre.debug.ztrans) console.log("inside make_send")
         
             zyre.on('whisper', (id, name, message) => {
-                if (options.zyre.testing) console.log("recieved direct msg")
+                if (options.zyre.debug.ztrans) console.log("recieved direct msg")
                 let input = transport_utils.parseJSON(seneca, 'client-' + type, message)
                 transport_utils.handle_response(seneca, input, client_options)
             });

@@ -1,6 +1,6 @@
 {
   "name": "seneca-zyre-transport",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "",
   "main": "index.js",
   "scripts": {
@@ -17,7 +17,7 @@
     "zeromq",
     "p2p"
   ],
-  "author": "justin",
+  "author": "Justin Robinson",
   "license": "MIT",
   "bugs": {
     "url": "https://github.com/fluidnotions/seneca-zyre-transport/issues"
