@@ -1,11 +1,11 @@
 var Seneca = require('seneca')
-var conf = require('../test-config')
-var ztrans = require('../..')
+var conf = require('./test-config')
+var ztrans = require('..')
 
 Seneca({
   tag: 'hex-service', transport: {
     zyre: {
-      ...conf.config2b,
+      ...conf.config2,
       name: "service"
     }
   }

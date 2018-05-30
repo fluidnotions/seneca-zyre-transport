@@ -1,14 +1,14 @@
 var Seneca = require('seneca')
-var conf = require('../test-config')
-var ztrans = require('../..')
+var conf = require('./test-config')
+var ztrans = require('..')
 
 Seneca({
-  tag: 'client', log: 'silent'
+  tag: 'client'
 })
 .test('print')
   .use(ztrans, {
     zyre: {
-      ...conf.config1b,
+      ...conf.config1,
       name: "client"
     }
   })
