@@ -1,3 +1,4 @@
+console.log("local net interfaces: ", require('os').networkInterfaces())
 // local net interfaces:  { 'Local Area Connection':
 //    [ { address: 'fe80::2c6e:1bd3:3329:acf',
 //        netmask: 'ffff:ffff:ffff:ffff::',
@@ -56,3 +57,4 @@ module.exports = {
     config1b,
     config2b
 }
+
