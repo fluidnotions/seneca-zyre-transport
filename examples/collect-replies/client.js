@@ -14,7 +14,7 @@ Seneca({
     }
   })
   .client({ type: 'zyre' })
-  // .listen({ type: 'zyre' })
+  .listen({ type: 'zyre' })
   .ready(function () {
 
     //seneca might be ready but the zryre transport isn't?
