@@ -87,12 +87,12 @@ module.exports = function (options) {
         return;
     }
 
-    seneca.add({ role: 'transport', type: 'zyre', cmd: 'getPeerIps', }, get_peer_ips );
+    seneca.add({ role: 'transport', type: 'zyre', cmd: 'getPeerEndpoints', }, get_peer_endpoints );
     seneca.add({ role: 'transport', hook: 'listen', type: 'zyre' }, transport_hook_listen )
     seneca.add({ role: 'transport', hook: 'client', type: 'zyre' }, transport_hook_client )
 
-    function get_peer_ips(msg, done) {
-        let peerIps = _.uniq(_.values(zyre._zyrePeers._peers).filter(p => p._connected).map(p => p._endpoint.split('/')[2].split(':')[0]).concat([zyre._ifaceData.address]));
+    function get_peer_endpoints(msg, done) {
+        let peerIps = _.values(zyre._zyrePeers._peers).filter(p => p._connected).map(p => p._endpoint.split('/')[2]).concat([zyre._ifaceData.address]);
         done(null, {
             peerIps: peerIps
         })
