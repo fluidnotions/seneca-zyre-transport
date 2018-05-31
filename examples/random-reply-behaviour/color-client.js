@@ -1,22 +1,24 @@
 var Seneca = require('seneca')
-var conf = require('./test-config')
-var ztrans = require('..')
+var conf = require('../test-config')
+var ztrans = require('../..')
 
 Seneca({
   tag: 'client'
 })
-.test('print')
+  .test('print')
   .use(ztrans, {
     zyre: {
-      ...conf.config1,
-      name: "client"
+      ...conf.config3,
+      debug: { ztrans: true }
     }
   })
   .client({ type: 'zyre' })
   .listen({ type: 'zyre' })
   .ready(function () {
 
-    setInterval(() => {
+    let c 
+    let i = setInterval(() => {
+      c++;
       this.act(
         {
           role: 'color',
@@ -27,7 +29,8 @@ Seneca({
           console.log(err && err.message || out.color)
           // this.close()
         })
-    }, 5000)
+      if (c > 3) clearInterval(i)
+    }, 10000)
 
   })
 

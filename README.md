@@ -1,10 +1,13 @@
 ![Seneca](http://senecajs.org/files/assets/seneca-logo.png)<br/>
-proximity p2p transport plugin using zyre.js  
+proximity p2p transport plugin using zyre.js
 
 # seneca-zyre-transport
 
 
-__Note:__ This is broadcast transport. All subscribed micro-services receive all messages. Hoverver responses are send directly back to the caller
+__Note:__ This is broadcast transport. All subscribed micro-services receive all messages. Hoverver responses are send directly back to the caller, contributions that incorperate seneca-balance-client as a dependancy are welcome, having to include pins/load balance peers doesn't really fit my use case. 
+So if a response/done call contains the property observed$: true, the message id isn't removed from the lru cache in default seneca-transport package and the calling 'act' can recieve responses multiple seneca peers that have the pattern. Not sure if leaving the message id in the cache might cause other issues. Next will be adding pattern so list can be called on the collective p2p mesh, if we know how many responses to expect the the calling 'act' can then remove the message id from the the cache when they are all recieve.
+**if you have experience with seneca and this approach doesn't make sense for some reason please open and issue, I've only just begun to explore the callback hell which is seneca's internals**
+
 
 ### Seneca compatibility
 Tested on  **3.5**

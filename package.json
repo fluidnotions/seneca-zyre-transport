@@ -1,10 +1,12 @@
 {
   "name": "seneca-zyre-transport",
-  "version": "1.0.2",
+  "version": "1.0.3",
   "description": "",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "dev:start:s": "node --inspect=127.0.0.1:9239 ./examples/random-reply-behaviour/hex-color-service.js",
+    "dev:start:c": "node --inspect=127.0.0.1:9249 ./examples/random-reply-behaviour/color-client.js"
   },
   "repository": {
     "type": "git",
@@ -24,8 +26,13 @@
   },
   "homepage": "https://github.com/fluidnotions/seneca-zyre-transport#readme",
   "dependencies": {
+    "eraro": "^1.0.0",
+    "jsonic": "^0.3.0",
     "lodash": "^4.17.10",
+    "nid": "^0.3.2",
+    "patrun": "^1.0.0",
     "seneca": "^3.6.0",
     "zyre.js": "^1.2.0"
-  }
+  },
+  "devDependencies": {}
 }
