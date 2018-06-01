@@ -24,5 +24,11 @@ Seneca({
       })
       
     })
+    this.add('type:typy,cmd:testing', (msg, done) => {
+      done(null, {
+        testy: true
+      })
+      
+    })
   })
 

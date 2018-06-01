@@ -21,8 +21,14 @@ Seneca({
     let count = 0;
     let i = setInterval(() => {
       count++
+      // this.act(
+      //   { role: 'printers', cmd: 'getPrintersOnline'},
+      //   function (err, out) {
+      //     console.log(err && err.message || out)
+      //     // this.close()
+      //   })
       this.act(
-        { role: 'printers', cmd: 'getPrintersOnline'},
+        { role: 'transport', type: 'zyre', cmd: 'getPeerPatterns'},
         function (err, out) {
           console.log(err && err.message || out)
           // this.close()

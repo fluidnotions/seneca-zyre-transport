@@ -34,7 +34,7 @@ module.exports = function (options) {
         so.transport,
         options)
 
-    let zyre, myZyreIdentity;
+    let zyre, myZyreIdentity, collectivePeerPatternsDict = {};//{zyrePeerId:zyrePeerId, patterns:seneca.list()}
     try {
         zyre = new Zyre(options.zyre);
         zyre.setEncoding('utf8');
@@ -45,31 +45,31 @@ module.exports = function (options) {
             let me = options.zyre.name;
             zyre.on('connect', (id, name, headers) => {
                 // seneca.log.debug
-                 console.log(me, ", on connect: ", JSON.stringify({ name, headers }))
+                console.log(me, ", on connect: ", JSON.stringify({ name, headers }))
             })
             zyre.on('disconnect', (id, name) => {
                 // seneca.log.debug
-                 console.log(me, ", on disconnect: ", JSON.stringify({ name }))
+                console.log(me, ", on disconnect: ", JSON.stringify({ name }))
             });
             zyre.on('expired', (id, name) => {
                 // seneca.log.debug
-                 console.log(me, ", on expired: ", JSON.stringify({ name }))
+                console.log(me, ", on expired: ", JSON.stringify({ name }))
             });
             zyre.on('join', (id, name, group) => {
                 // seneca.log.debug
-                 console.log("on join: ", JSON.stringify({ name }))
+                console.log("on join: ", JSON.stringify({ name }))
             });
             zyre.on('leave', (id, name, group) => {
                 // seneca.log.debug
-                 console.log("on leave: ", JSON.stringify({ name }))
+                console.log("on leave: ", JSON.stringify({ name }))
             });
             zyre.on('shout', (id, name, message, group) => {
                 // seneca.log.debug
-                if(group !== "stayalive")  console.log(me, ", on shout: ", JSON.stringify({ name, group }))
+                if (group !== "stayalive") console.log(me, ", on shout: ", JSON.stringify({ name, group }))
             })
             zyre.on('whisper', (id, name, message) => {
                 // seneca.log.debug
-                 console.log(me, "on whisper: ", JSON.stringify({ name }))
+                console.log(me, "on whisper: ", JSON.stringify({ name }))
             });
 
 
@@ -81,20 +81,47 @@ module.exports = function (options) {
             let i = setInterval(() => {
                 zyre.shout("stayalive", "ping");
             }, 1000)
+            collect_peer_patterns();
         });
     } catch (err) {
         console.error(err.message)
         return;
     }
 
-    seneca.add({ role: 'transport', type: 'zyre', cmd: 'getPeerEndpoints', }, get_peer_endpoints );
-    seneca.add({ role: 'transport', hook: 'listen', type: 'zyre' }, transport_hook_listen )
-    seneca.add({ role: 'transport', hook: 'client', type: 'zyre' }, transport_hook_client )
+    seneca.add({ role: 'transport', type: 'zyre', cmd: 'getPeerEndpoints'}, get_peer_endpoints);
+    seneca.add({ role: 'transport', type: 'zyre', cmd: 'getPeerPatterns'}, get_peer_patterns);
+    seneca.add({ role: 'transport', hook: 'listen', type: 'zyre' }, transport_hook_listen)
+    seneca.add({ role: 'transport', hook: 'client', type: 'zyre' }, transport_hook_client)
 
     function get_peer_endpoints(msg, done) {
         let peerIps = _.values(zyre._zyrePeers._peers).filter(p => p._connected).map(p => p._endpoint.split('/')[2]).concat([zyre._ifaceData.address]);
         done(null, {
             peerIps: peerIps
+        })
+    }
+
+    //act to self should conatin all the patterns collected in collectivePeerPatternsDict
+    function get_peer_patterns(msg, done) {
+        done(null, collectivePeerPatternsDict)
+    }
+
+    //have to do it this way, if your own instance contains a pattern you can't get the act broadcast to go over the mesh
+    function collect_peer_patterns() {
+        zyre.join("peer-pattern-collector");
+        let i = setInterval(() => {
+            if (seneca && seneca.list) {
+                let filteredList = seneca.list().filter(p => !p.role || (p.role !== 'transport' && p.role !== 'seneca'  && p.role !== 'options')).filter(p => !_.isEmpty(p));
+                let ppi = {zyrePeerId: myZyreIdentity.zyrePeerId, patterns: filteredList};
+                // console.log("shouting out ppi: ", ppi)
+                zyre.shout("peer-pattern-collector", JSON.stringify(ppi))
+            }
+        }, 1000)
+        zyre.on('shout', (id, name, message, group) => {
+            if (group === "peer-pattern-collector") {
+                let ppi = JSON.parse(message);
+                // console.log("hearing in ppi: ", ppi)
+                collectivePeerPatternsDict[ppi.zyrePeerId] = ppi["patterns"];
+            }
         })
     }
 
@@ -112,7 +139,7 @@ module.exports = function (options) {
                 if (!originZyrePeer) {
                     seneca.log.error('transport', 'zyre', new Error('incoming message has no originZyrePeer'))
                 }
-                
+
                 transport_utils.handle_request(seneca, data, listen_options, function (out) {
                     if (out == null) {
                         seneca.log.info("no result")
@@ -154,7 +181,7 @@ module.exports = function (options) {
 
         function make_send(spec, topic, send_done) {
             if (options.zyre.debug.ztrans) console.log("inside make_send")
-        
+
             zyre.on('whisper', (id, name, message) => {
                 if (options.zyre.debug.ztrans) console.log("recieved direct msg from ", name)
                 let input = transport_utils.parseJSON(seneca, 'client-' + type, message)
@@ -183,89 +210,89 @@ module.exports = function (options) {
         data.time = data.time || {}
         data.time.client_recv = Date.now()
         data.sync = void 0 === data.sync ? true : data.sync
-      
+
         if (data.kind !== 'res') {
-          if (transport_utils._context.options.warn.invalid_kind) {
-            seneca.log.warn('client', 'invalid_kind_res', client_options, data)
-          }
-          return false
+            if (transport_utils._context.options.warn.invalid_kind) {
+                seneca.log.warn('client', 'invalid_kind_res', client_options, data)
+            }
+            return false
         }
-      
+
         if (data.id === null) {
-          if (transport_utils._context.options.warn.no_message_id) {
-            seneca.log.warn('client', 'no_message_id', client_options, data)
-          }
-          return false
+            if (transport_utils._context.options.warn.no_message_id) {
+                seneca.log.warn('client', 'no_message_id', client_options, data)
+            }
+            return false
         }
-      
+
         if (seneca.id !== data.origin) {
-          if (transport_utils._context.options.warn.invalid_origin) {
-            seneca.log.warn('client', 'invalid_origin', client_options, data)
-          }
-          return false
+            if (transport_utils._context.options.warn.invalid_origin) {
+                seneca.log.warn('client', 'invalid_origin', client_options, data)
+            }
+            return false
         }
-      
+
         var err = null
         var result = null
-      
+
         if (data.error) {
-          err = new Error(data.error.message)
-      
-          _.each(data.error, function (value, key) {
-            err[key] = value
-          })
-      
-          if (!data.sync) {
-            seneca.log.warn('client', 'unexcepted_async_error', client_options, data, err)
-            return true
-          }
+            err = new Error(data.error.message)
+
+            _.each(data.error, function (value, key) {
+                err[key] = value
+            })
+
+            if (!data.sync) {
+                seneca.log.warn('client', 'unexcepted_async_error', client_options, data, err)
+                return true
+            }
         }
         else {
-          result = transport_utils.handle_entity(seneca, data.res)
+            result = transport_utils.handle_entity(seneca, data.res)
         }
-      
+
         if (!data.sync) {
-          return true
+            return true
         }
-      
+
         var callmeta = transport_utils._context.callmap.get(data.id)
-      
+
         if (callmeta) {
             //the first one deletes it, second one returns false and that is why only one response can be recieved in default implementation
             //FIXME: this does create a problem though when in the lru-cache callmap in seneca-transport module cleared of the msg id, or does it even matter if this is
             //always unique?
-           if(!data.res.observed$) transport_utils._context.callmap.del(data.id) 
-          
+            if (!data.res.observed$) transport_utils._context.callmap.del(data.id)
+
         }
         else {
-          if (transport_utils._context.options.warn.unknown_message_id) {
-            seneca.log.warn('client', 'unknown_message_id', client_options, data)
-          }
-          return false
+            if (transport_utils._context.options.warn.unknown_message_id) {
+                seneca.log.warn('client', 'unknown_message_id', client_options, data)
+            }
+            return false
         }
-      
-      
-        var actinfo = {
-          id: data.id,
-          accept: data.accept,
-          track: data.track,
-          time: data.time
-        }
-      
-        transport_utils.callmeta({
-          callmeta: callmeta,
-          err: err,
-          result: result,
-          actinfo: actinfo,
-          seneca: seneca,
-          client_options: client_options,
-          data: data
-        })
-      
-        return true
-      }
 
-   
+
+        var actinfo = {
+            id: data.id,
+            accept: data.accept,
+            track: data.track,
+            time: data.time
+        }
+
+        transport_utils.callmeta({
+            callmeta: callmeta,
+            err: err,
+            result: result,
+            actinfo: actinfo,
+            seneca: seneca,
+            client_options: client_options,
+            data: data
+        })
+
+        return true
+    }
+
+
 
     return {
         name: plugin
