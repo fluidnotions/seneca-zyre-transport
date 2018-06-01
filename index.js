@@ -65,7 +65,7 @@ module.exports = function (options) {
             });
             zyre.on('shout', (id, name, message, group) => {
                 // seneca.log.debug
-                if (group !== "stayalive") console.log(me, ", on shout: ", JSON.stringify({ name, group }))
+                if (group !== "stayalive" && group !== "peer-pattern-collector") console.log(me, ", on shout: ", JSON.stringify({ name, group }))
             })
             zyre.on('whisper', (id, name, message) => {
                 // seneca.log.debug
