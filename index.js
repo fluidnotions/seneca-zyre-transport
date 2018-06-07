@@ -94,6 +94,7 @@ module.exports = function (options) {
     seneca.add({ role: 'transport', hook: 'client', type: 'zyre' }, transport_hook_client)
 
     function get_peer_endpoints(msg, done) {
+        if (options.zyre.debug.ztrans) console.log("_.values(zyre._zyrePeers._peers): ", _.values(zyre._zyrePeers._peers));
         let peerIps = _.values(zyre._zyrePeers._peers).filter(p => p._connected).map(p => p._endpoint.split('/')[2]).concat([zyre._ifaceData.address]);
         done(null, {
             peerIps: peerIps

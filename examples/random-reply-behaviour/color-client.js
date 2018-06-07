@@ -16,29 +16,33 @@ Seneca({
   .listen({ type: 'zyre' })
   .ready(function () {
 
-    let c 
-    let i = setInterval(() => {
-      c++;
+    // let c 
+    // let i = setInterval(() => {
+    //   c++;
+    //   this.act(
+    //     {
+    //       role: 'color',
+    //       format: 'hex',
+    //       color: 'red'
+    //     },
+    //     function (err, out) {
+    //       console.log(err && err.message || out.color)
+    //       // this.close()
+    //     })
+    //   if (c > 3) clearInterval(i)
+    // }, 10000)
+
+    setTimeout(()=> {
       this.act(
-        {
-          role: 'color',
-          format: 'hex',
-          color: 'red'
-        },
+        { role: 'transport', type: 'zyre', cmd: 'getPeerEndpoints', },
         function (err, out) {
           console.log(err && err.message || out.color)
           // this.close()
         })
-      if (c > 3) clearInterval(i)
-    }, 10000)
-
+    }, 3000)
+  
   })
 
-  // this.act(
-    //   { role: 'transport', type: 'zyre', cmd: 'getPeerIps', },
-    //   function (err, out) {
-    //     console.log(err && err.message || out.color)
-    //     // this.close()
-    //   })
+  
 
 
