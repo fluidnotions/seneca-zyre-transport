@@ -208,7 +208,6 @@ module.exports = function (options) {
     }
 
     function override_transport_util_handle_response(seneca, data, client_options) {
-        if(!data) data = {};
         data.time = data.time || {}
         data.time.client_recv = Date.now()
         data.sync = void 0 === data.sync ? true : data.sync
@@ -263,7 +262,7 @@ module.exports = function (options) {
             //the first one deletes it, second one returns false and that is why only one response can be recieved in default implementation
             //FIXME: this does create a problem though when in the lru-cache callmap in seneca-transport module cleared of the msg id, or does it even matter if this is
             //always unique?
-            if (!data.res.observed$) transport_utils._context.callmap.del(data.id)
+            if (data.res && !data.res.observed$) transport_utils._context.callmap.del(data.id)
 
         }
         else {
