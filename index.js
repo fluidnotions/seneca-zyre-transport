@@ -208,6 +208,7 @@ module.exports = function (options) {
     }
 
     function override_transport_util_handle_response(seneca, data, client_options) {
+        if(!data) data = {};
         data.time = data.time || {}
         data.time.client_recv = Date.now()
         data.sync = void 0 === data.sync ? true : data.sync
